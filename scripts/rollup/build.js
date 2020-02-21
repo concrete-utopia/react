@@ -161,7 +161,6 @@ function getBabelConfig(
         ]),
       });
     case UMD_DEV:
-    case UMD_PROD:
     case UMD_PROFILING:
     case NODE_DEV:
     case NODE_PROD:
@@ -172,6 +171,17 @@ function getBabelConfig(
           path.resolve('./scripts/babel/transform-object-assign-require'),
           // Minify invariant messages
           require('../error-codes/transform-error-messages'),
+        ]),
+      });
+    case UMD_PROD:
+      return Object.assign({}, options, {
+        plugins: options.plugins.concat([
+          // Do not include object-assign polyfill, this is supported from chrome 45
+          // Preserve full error messages
+          [
+            require('../error-codes/transform-error-messages'),
+            {noMinify: true},
+          ],
         ]),
       });
     default:
