@@ -142,7 +142,11 @@ function getBabelConfig(
       return Object.assign({}, options, {
         plugins: options.plugins.concat([
           // Minify invariant messages
-          require('../error-codes/transform-error-messages'),
+          [
+            require('../error-codes/transform-error-messages'),
+            // Preserve full error messages for ∆
+            {noMinify: true},
+          ],
         ]),
       });
     case RN_OSS_DEV:
@@ -171,7 +175,11 @@ function getBabelConfig(
           // Use object-assign polyfill in open source
           path.resolve('./scripts/babel/transform-object-assign-require'),
           // Minify invariant messages
-          require('../error-codes/transform-error-messages'),
+          [
+            require('../error-codes/transform-error-messages'),
+            // Preserve full error messages for ∆
+            {noMinify: true},
+          ],
         ]),
       });
     default:
