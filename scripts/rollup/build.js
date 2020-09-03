@@ -183,7 +183,7 @@ function getBabelConfig(
           // Minify invariant messages
           [
             require('../error-codes/transform-error-messages'),
-            // Preserve full error messages for ∆
+            // Preserve full error messages for Utopia
             {noMinify: true},
           ],
         ]),
@@ -216,7 +216,7 @@ function getBabelConfig(
           // Minify invariant messages
           [
             require('../error-codes/transform-error-messages'),
-            // Preserve full error messages for ∆
+            // Preserve full error messages for Utopia
             {noMinify: true},
           ],
         ]),
