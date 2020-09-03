@@ -1,75 +1,27 @@
-# [React](https://reactjs.org/) &middot; [![GitHub license](https://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/facebook/react/blob/master/LICENSE) [![npm version](https://img.shields.io/npm/v/react.svg?style=flat)](https://www.npmjs.com/package/react) [![CircleCI Status](https://circleci.com/gh/facebook/react.svg?style=shield&circle-token=:circle-token)](https://circleci.com/gh/facebook/react) [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](https://reactjs.org/docs/how-to-contribute.html#your-first-pull-request)
+# Utopian React
+Utopian React is React, except for one change: we modify the production build of React to include un-minified error messages. Because our editor and projects are in the same document, and because this is how React works, projects have to use the same build of React as we use in the editor. We use the production build because this means faster performance for users, but we also want users to be able to read un-minified error messages. So we have changed the build process to keep unminified error messages.
 
-React is a JavaScript library for building user interfaces.
+The results of the build are then pushed to `utopia-react`, and `utopia-react-dom`, and aliased to `react` and `react-dom` in the editor.
 
-* **Declarative:** React makes it painless to create interactive UIs. Design simple views for each state in your application, and React will efficiently update and render just the right components when your data changes. Declarative views make your code more predictable, simpler to understand, and easier to debug.
-* **Component-Based:** Build encapsulated components that manage their own state, then compose them to make complex UIs. Since component logic is written in JavaScript instead of templates, you can easily pass rich data through your app and keep state out of the DOM.
-* **Learn Once, Write Anywhere:** We don't make assumptions about the rest of your technology stack, so you can develop new features in React without rewriting existing code. React can also render on the server using Node and power mobile apps using [React Native](https://reactnative.dev/).
+## How to update and build Utopian React
+### Update React
+1. Find the tag or commit you want to build from [the main React repo](https://github.com/facebook/react)
+2. Make a pr against master in this repo.
+3. Make sure the changes haven't messed up the lines changed in the build script at /scripts/rollup/build.js. It should roughly keep the `noMinify: true` settings the same as they were from this change: https://github.com/concrete-utopia/react/commit/c96e246bb3620ed3b86d92ef725c7f1a3cffcbb2.
+4. Merge that pull request
 
-[Learn how to use React in your own project](https://reactjs.org/docs/getting-started.html).
+### Build Utopian React
+1. Check out concrete-utopia/react on your local computer.
+2. Install with `$ yarn` and then build React using `$ yarn build react,react-dom`
+3. Go make a cup of tea. Unless you are Sean, building will take quite a few minutes.
 
-## Installation
+### Update Utopian React on npm
+1. Open up the `react` and `react-dom` directories from `utopia/editor/node_modules`.
+2. For each directory delete the contents with the exception of package.json.
+3. Update the `version` field in both `react` and `react-dom` to the target version number.
+4. In `react-dom`'s package.json only: update the peer dependency to point to `"^XX.X.X"`, where XX.X.X is the current target version. Note the leading circumflex.
+5. Take `react` and `react-dom` directories from `react/build/node_modules/` and respectively overwrite the contents (save the `package.json`s) of the `utopia/editor/node_modules/react` and `utopia/editor/node_modules/react-dom` directories.
+6. Run `npm publish` in each directory. This publishes them to [utopia-react](https://www.npmjs.com/package/utopia-react) and [utopia-react-dom](https://www.npmjs.com/package/utopia-react-dom)
 
-React has been designed for gradual adoption from the start, and **you can use as little or as much React as you need**:
-
-* Use [Online Playgrounds](https://reactjs.org/docs/getting-started.html#online-playgrounds) to get a taste of React.
-* [Add React to a Website](https://reactjs.org/docs/add-react-to-a-website.html) as a `<script>` tag in one minute.
-* [Create a New React App](https://reactjs.org/docs/create-a-new-react-app.html) if you're looking for a powerful JavaScript toolchain.
-
-You can use React as a `<script>` tag from a [CDN](https://reactjs.org/docs/cdn-links.html), or as a `react` package on [npm](https://www.npmjs.com/package/react).
-
-## Documentation
-
-You can find the React documentation [on the website](https://reactjs.org/docs).  
-
-Check out the [Getting Started](https://reactjs.org/docs/getting-started.html) page for a quick overview.
-
-The documentation is divided into several sections:
-
-* [Tutorial](https://reactjs.org/tutorial/tutorial.html)
-* [Main Concepts](https://reactjs.org/docs/hello-world.html)
-* [Advanced Guides](https://reactjs.org/docs/jsx-in-depth.html)
-* [API Reference](https://reactjs.org/docs/react-api.html)
-* [Where to Get Support](https://reactjs.org/community/support.html)
-* [Contributing Guide](https://reactjs.org/docs/how-to-contribute.html)
-
-You can improve it by sending pull requests to [this repository](https://github.com/reactjs/reactjs.org).
-
-## Examples
-
-We have several examples [on the website](https://reactjs.org/). Here is the first one to get you started:
-
-```jsx
-function HelloMessage({ name }) {
-  return <div>Hello {name}</div>;
-}
-
-ReactDOM.render(
-  <HelloMessage name="Taylor" />,
-  document.getElementById('container')
-);
-```
-
-This example will render "Hello Taylor" into a container on the page.
-
-You'll notice that we used an HTML-like syntax; [we call it JSX](https://reactjs.org/docs/introducing-jsx.html). JSX is not required to use React, but it makes code more readable, and writing it feels like writing HTML. If you're using React as a `<script>` tag, read [this section](https://reactjs.org/docs/add-react-to-a-website.html#optional-try-react-with-jsx) on integrating JSX; otherwise, the [recommended JavaScript toolchains](https://reactjs.org/docs/create-a-new-react-app.html) handle it automatically.
-
-## Contributing
-
-The main purpose of this repository is to continue evolving React core, making it faster and easier to use. Development of React happens in the open on GitHub, and we are grateful to the community for contributing bugfixes and improvements. Read below to learn how you can take part in improving React.
-
-### [Code of Conduct](https://code.fb.com/codeofconduct)
-
-Facebook has adopted a Code of Conduct that we expect project participants to adhere to. Please read [the full text](https://code.fb.com/codeofconduct) so that you can understand what actions will and will not be tolerated.
-
-### [Contributing Guide](https://reactjs.org/contributing/how-to-contribute.html)
-
-Read our [contributing guide](https://reactjs.org/contributing/how-to-contribute.html) to learn about our development process, how to propose bugfixes and improvements, and how to build and test your changes to React.
-
-### Good First Issues
-
-To help you get your feet wet and get you familiar with our contribution process, we have a list of [good first issues](https://github.com/facebook/react/labels/good%20first%20issue) that contain bugs which have a relatively limited scope. This is a great place to get started.
-
-### License
-
-React is [MIT licensed](./LICENSE).
+### Testing
+You can confirm error messages have properly been compiled without minification simply by breaking React with e.g. a call to `useEffect()` outside a function component in the code editor, while running react in performance mode. **TBD: CONFIRM THIS ACTUALLY RUNS REACT IN PRODUCTION MODE**
