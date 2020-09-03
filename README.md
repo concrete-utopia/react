@@ -1,5 +1,5 @@
 # Utopian React
-Utopian React is React, except for one change: we modify the production build of React to include un-minified error messages. Because our editor and projects are in the same document, and because this is how React works, projects have to use the same build of React as we use in the editor. We use the production build because this means faster performance for users, but we also want users to be able to read un-minified error messages. So we have changed the build process to keep unminified error messages.
+Utopian React is React, except for one change: we modify the production build of React to include un-minified error messages. Because our editor and projects are in the same document, and because React can only have one version per document, projects have to use the same build of React as we use in the editor. We use the production build because this means faster performance for users, but we also want users to be able to read un-minified error messages. So we have changed the build process to keep unminified error messages.
 
 The results of the build are then pushed to `utopia-react`, and `utopia-react-dom`, and aliased to `react` and `react-dom` in the editor.
 
@@ -20,7 +20,7 @@ The results of the build are then pushed to `utopia-react`, and `utopia-react-do
 2. For each directory delete the contents with the exception of package.json.
 3. Update the `version` field in both `react` and `react-dom` to the target version number.
 4. In `react-dom`'s package.json only: update the peer dependency to point to `"^XX.X.X"`, where XX.X.X is the current target version. Note the leading circumflex.
-5. Take `react` and `react-dom` directories from `react/build/node_modules/` and respectively overwrite the contents (save the `package.json`s) of the `utopia/editor/node_modules/react` and `utopia/editor/node_modules/react-dom` directories.
+5. Take the built `react` and `react-dom` directories from `react/build/node_modules/` and respectively overwrite the contents (save the `package.json`s) of the `utopia/editor/node_modules/react` and `utopia/editor/node_modules/react-dom` directories.
 6. Run `npm publish` in each directory. This publishes them to [utopia-react](https://www.npmjs.com/package/utopia-react) and [utopia-react-dom](https://www.npmjs.com/package/utopia-react-dom)
 
 ### Testing
