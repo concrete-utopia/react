@@ -21,7 +21,7 @@ The results of the build are then pushed to `utopia-react`, and `utopia-react-do
 3. Update the `version` field in both `react` and `react-dom` to the target version number.
 4. In `react-dom`'s package.json only: update the peer dependency to point to `"^XX.X.X"`, where XX.X.X is the current target version. Note the leading circumflex.
 5. Take the built `react` and `react-dom` directories from `react/build/node_modules/` and respectively overwrite the contents (save the `package.json`s) of the `utopia/editor/node_modules/react` and `utopia/editor/node_modules/react-dom` directories.
-6. Run `npm publish` in each directory. This publishes them to [utopia-react](https://www.npmjs.com/package/utopia-react) and [utopia-react-dom](https://www.npmjs.com/package/utopia-react-dom)
+6. Run `npm publish` in each directory. This publishes them to [utopia-react](https://www.npmjs.com/package/utopia-react) and [utopia-react-dom](https://www.npmjs.com/package/utopia-react-dom) (contact @alecmolloy for write access to these packages.)
 
 ### Testing
 You can confirm error messages have properly been compiled without minification simply by breaking React with e.g. a call to `useEffect()` outside a function component in the code editor, while running react in performance mode. **TBD: CONFIRM THIS ACTUALLY RUNS REACT IN PRODUCTION MODE**
