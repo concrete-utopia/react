@@ -7,13 +7,10 @@
  * @flow
  */
 
-import Symbol from 'es6-symbol';
 import LRU from 'lru-cache';
 import {
   isElement,
   typeOf,
-  AsyncMode,
-  ConcurrentMode,
   ContextConsumer,
   ContextProvider,
   ForwardRef,
@@ -25,6 +22,7 @@ import {
   StrictMode,
   Suspense,
 } from 'react-is';
+import {REACT_SUSPENSE_LIST_TYPE as SuspenseList} from 'shared/ReactSymbols';
 import {
   TREE_OPERATION_ADD,
   TREE_OPERATION_REMOVE,
@@ -34,6 +32,7 @@ import {
 import {ElementTypeRoot} from 'react-devtools-shared/src/types';
 import {
   LOCAL_STORAGE_FILTER_PREFERENCES_KEY,
+  LOCAL_STORAGE_SHOULD_BREAK_ON_CONSOLE_ERRORS,
   LOCAL_STORAGE_SHOULD_PATCH_CONSOLE_KEY,
 } from './constants';
 import {ComponentFilterElementType, ElementTypeHostComponent} from './types';
@@ -45,14 +44,13 @@ import {
 } from 'react-devtools-shared/src/types';
 import {localStorageGetItem, localStorageSetItem} from './storage';
 import {meta} from './hydration';
-
 import type {ComponentFilter, ElementType} from './types';
 
 const cachedDisplayNames: WeakMap<Function, string> = new WeakMap();
 
 // On large trees, encoding takes significant time.
 // Try to reuse the already encoded strings.
-let encodedStringCache = new LRU({max: 1000});
+const encodedStringCache = new LRU({max: 1000});
 
 export function alphaSortKeys(a: string, b: string): number {
   if (a > b) {
@@ -99,7 +97,7 @@ export function utfDecodeString(array: Array<number>): string {
 }
 
 export function utfEncodeString(string: string): Array<number> {
-  let cached = encodedStringCache.get(string);
+  const cached = encodedStringCache.get(string);
   if (cached !== undefined) {
     return cached;
   }
@@ -251,6 +249,25 @@ export function setAppendComponentStack(value: boolean): void {
   );
 }
 
+export function getBreakOnConsoleErrors(): boolean {
+  try {
+    const raw = localStorageGetItem(
+      LOCAL_STORAGE_SHOULD_BREAK_ON_CONSOLE_ERRORS,
+    );
+    if (raw != null) {
+      return JSON.parse(raw);
+    }
+  } catch (error) {}
+  return false;
+}
+
+export function setBreakOnConsoleErrors(value: boolean): void {
+  localStorageSetItem(
+    LOCAL_STORAGE_SHOULD_BREAK_ON_CONSOLE_ERRORS,
+    JSON.stringify(value),
+  );
+}
+
 export function separateDisplayNameAndHOCs(
   displayName: string | null,
   type: ElementType,
@@ -278,18 +295,32 @@ export function separateDisplayNameAndHOCs(
       break;
   }
 
+  if (type === ElementTypeMemo) {
+    if (hocDisplayNames === null) {
+      hocDisplayNames = ['Memo'];
+    } else {
+      hocDisplayNames.unshift('Memo');
+    }
+  } else if (type === ElementTypeForwardRef) {
+    if (hocDisplayNames === null) {
+      hocDisplayNames = ['ForwardRef'];
+    } else {
+      hocDisplayNames.unshift('ForwardRef');
+    }
+  }
+
   return [displayName, hocDisplayNames];
 }
 
 // Pulled from react-compat
 // https://github.com/developit/preact-compat/blob/7c5de00e7c85e2ffd011bf3af02899b63f699d3a/src/index.js#L349
 export function shallowDiffers(prev: Object, next: Object): boolean {
-  for (let attribute in prev) {
+  for (const attribute in prev) {
     if (!(attribute in next)) {
       return true;
     }
   }
-  for (let attribute in next) {
+  for (const attribute in next) {
     if (prev[attribute] !== next[attribute]) {
       return true;
     }
@@ -341,6 +372,7 @@ export type DataType =
   | 'data_view'
   | 'date'
   | 'function'
+  | 'html_all_collection'
   | 'html_element'
   | 'infinity'
   | 'iterator'
@@ -407,14 +439,26 @@ export function getDataType(data: Object): DataType {
         return 'iterator';
       } else if (data.constructor && data.constructor.name === 'RegExp') {
         return 'regexp';
-      } else if (Object.prototype.toString.call(data) === '[object Date]') {
-        return 'date';
+      } else {
+        const toStringValue = Object.prototype.toString.call(data);
+        if (toStringValue === '[object Date]') {
+          return 'date';
+        } else if (toStringValue === '[object HTMLAllCollection]') {
+          return 'html_all_collection';
+        }
       }
       return 'object';
     case 'string':
       return 'string';
     case 'symbol':
       return 'symbol';
+    case 'undefined':
+      if (
+        Object.prototype.toString.call(data) === '[object HTMLAllCollection]'
+      ) {
+        return 'html_all_collection';
+      }
+      return 'undefined';
     default:
       return 'unknown';
   }
@@ -425,9 +469,6 @@ export function getDisplayNameForReactElement(
 ): string | null {
   const elementType = typeOf(element);
   switch (elementType) {
-    case AsyncMode:
-    case ConcurrentMode:
-      return 'ConcurrentMode';
     case ContextConsumer:
       return 'ContextConsumer';
     case ContextProvider:
@@ -448,12 +489,16 @@ export function getDisplayNameForReactElement(
       return 'StrictMode';
     case Suspense:
       return 'Suspense';
+    case SuspenseList:
+      return 'SuspenseList';
     default:
       const {type} = element;
       if (typeof type === 'string') {
         return type;
-      } else if (type != null) {
+      } else if (typeof type === 'function') {
         return getDisplayName(type, 'Anonymous');
+      } else if (type != null) {
+        return 'NotImplementedInDevtools';
       } else {
         return 'Element';
       }
@@ -511,7 +556,9 @@ export function formatDataForPreview(
     case 'html_element':
       return `<${truncateForDisplay(data.tagName.toLowerCase())} />`;
     case 'function':
-      return truncateForDisplay(`ƒ ${data.name}() {}`);
+      return truncateForDisplay(
+        `ƒ ${typeof data.name === 'function' ? '' : data.name}() {}`,
+      );
     case 'string':
       return `"${data}"`;
     case 'bigint':

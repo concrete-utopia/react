@@ -53,13 +53,13 @@ function hasValidKey(config) {
   return config.key !== undefined;
 }
 
-function warnIfStringRefCannotBeAutoConverted(config) {
+function warnIfStringRefCannotBeAutoConverted(config, self) {
   if (__DEV__) {
     if (
       typeof config.ref === 'string' &&
       ReactCurrentOwner.current &&
-      config.__self &&
-      ReactCurrentOwner.current.stateNode !== config.__self
+      self &&
+      ReactCurrentOwner.current.stateNode !== self
     ) {
       const componentName = getComponentName(ReactCurrentOwner.current.type);
 
@@ -70,7 +70,7 @@ function warnIfStringRefCannotBeAutoConverted(config) {
             'This case cannot be automatically converted to an arrow function. ' +
             'We ask you to manually fix this case by using useRef() or createRef() instead. ' +
             'Learn more about using refs safely here: ' +
-            'https://fb.me/react-strict-mode-string-ref',
+            'https://reactjs.org/link/strict-mode-string-ref',
           getComponentName(ReactCurrentOwner.current.type),
           config.ref,
         );
@@ -89,7 +89,7 @@ function defineKeyPropWarningGetter(props, displayName) {
           '%s: `key` is not a prop. Trying to access it will result ' +
             'in `undefined` being returned. If you need to access the same ' +
             'value within the child component, you should pass it as a different ' +
-            'prop. (https://fb.me/react-special-props)',
+            'prop. (https://reactjs.org/link/special-props)',
           displayName,
         );
       }
@@ -111,7 +111,7 @@ function defineRefPropWarningGetter(props, displayName) {
           '%s: `ref` is not a prop. Trying to access it will result ' +
             'in `undefined` being returned. If you need to access the same ' +
             'value within the child component, you should pass it as a different ' +
-            'prop. (https://fb.me/react-special-props)',
+            'prop. (https://reactjs.org/link/special-props)',
           displayName,
         );
       }
@@ -296,7 +296,7 @@ export function jsxDEV(type, config, maybeKey, source, self) {
 
     if (hasValidRef(config)) {
       ref = config.ref;
-      warnIfStringRefCannotBeAutoConverted(config);
+      warnIfStringRefCannotBeAutoConverted(config, self);
     }
 
     // Remaining properties are added to a new props object
