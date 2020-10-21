@@ -24,4 +24,4 @@ The results of the build are then pushed to `utopia-react`, and `utopia-react-do
 6. Run `npm publish` in each directory. This publishes them to [utopia-react](https://www.npmjs.com/package/utopia-react) and [utopia-react-dom](https://www.npmjs.com/package/utopia-react-dom) (contact @alecmolloy for write access to these packages.)
 
 ### Testing
-You can confirm error messages have properly been compiled without minification simply by breaking React with e.g. a call to `useEffect()` outside a function component in the code editor, while running react in performance mode. **TBD: CONFIRM THIS ACTUALLY RUNS REACT IN PRODUCTION MODE**
+You can confirm error messages have properly been compiled without minification simply by breaking React with e.g. a call to `useEffect()` outside a function component in the code editor, while running react in performance mode.
